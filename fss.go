@@ -30,8 +30,8 @@ func main() {
 	// A -> G = 6 transition
 	// G -> A = 6 transition
 	
-	generations := 10
-	population_size := 4
+	generations := 20
+	population_size := 10
 	
 	// search replicates
 	//B := 1
@@ -39,7 +39,7 @@ func main() {
 	sub_sample_size := 500
 	// sequence slice size
 	subn := 100
-	vary_dnastat := 1
+	//vary_dnastat := 1
 	print_dists := 0
 	
 	// output
@@ -66,11 +66,23 @@ func main() {
 	
 	var population = make([]string, population_size)
 	
-	for pop := 0; pop < population_size; pop++ {
+	last_dna_a := dna_a
+	last_dna_t := dna_t
+	last_dna_g := dna_g
+	last_dna_c := dna_c
+	
+	last_dna_6 := dna_6
+	last_dna_23 := dna_23
+	last_dna_4 := dna_4
+	last_dna_19	:= dna_19
+	last_dna_2 := dna_2
+	last_dna_21 := dna_21
 		
+	for pop := 0; pop < population_size; pop++ {
 		
 		final_cor := 0.0
 		
+
 		for gen := 0; gen < generations; gen++ {			
 
 			var correlations = make([]float64, generations)
@@ -78,7 +90,19 @@ func main() {
 			var eucdists = make([]float64, sub_sample_size)
 			var weights = make([]float64, sub_sample_size)
 			
-			if vary_dnastat == 1 {
+			if gen == 0 {
+				dna_a = last_dna_a
+				dna_t = last_dna_t
+				dna_g = last_dna_g
+				dna_c = last_dna_c
+				
+				dna_6 = last_dna_6
+				dna_23 = last_dna_23
+				dna_4 = last_dna_4
+				dna_19	= last_dna_19
+				dna_2 = last_dna_2
+				dna_21 = last_dna_21
+			} else {
 				dna_a 	= mutate(dna_a, 5, 15)
 				dna_t 	= mutate(dna_t, 5, 15)
 				dna_g 	= mutate(dna_g, 5, 15)
@@ -198,9 +222,9 @@ func main() {
 
 				//fmt.Printf("s1: %v, s2: %v\n", s1_pt, s2_pt)
 
-				//radius1 := math.Sqrt(s1_pt[0]*s1_pt[0] + s1_pt[1]*s1_pt[1] + s1_pt[2]*s1_pt[2])
-				//radius2 := math.Sqrt(s2_pt[0]*s2_pt[0] + s2_pt[1]*s2_pt[1] + s2_pt[2]*s2_pt[2])
-				//radist := math.Abs(radius1 - radius2)
+				radius1 := math.Sqrt(s1_pt[0]*s1_pt[0] + s1_pt[1]*s1_pt[1] + s1_pt[2]*s1_pt[2])
+				radius2 := math.Sqrt(s2_pt[0]*s2_pt[0] + s2_pt[1]*s2_pt[1] + s2_pt[2]*s2_pt[2])
+				radist := math.Abs(radius1 - radius2)
 
 				eucdist := math.Sqrt(math.Pow(s1_pt[0]-s2_pt[0], 2) + math.Pow(s1_pt[1]-s2_pt[1], 2) + math.Pow(s1_pt[2]-s2_pt[2], 2))
 				if print_dists == 1 {
@@ -208,7 +232,7 @@ func main() {
 				}
 
 				pdists[sample] = pdist
-				eucdists[sample] = eucdist
+				eucdists[sample] = radist
 				weights[sample] = 1.0
 				
 			}
@@ -220,8 +244,8 @@ func main() {
 			final_cor = c
 			
 			// rep, a, t, g, c, dna_6, dna_23, dna_4, dna_19, dna_2, dna_21, correlation	
-			outp_string := fmt.Sprintf("%d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.5f\n", gen, dna_a, dna_t, dna_g, dna_c, dna_6, dna_23, dna_4, dna_19, dna_2, dna_21, c)
-			fmt.Print(outp_string)
+			//outp_string := fmt.Sprintf("%d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.5f\n", gen, dna_a, dna_t, dna_g, dna_c, dna_6, dna_23, dna_4, dna_19, dna_2, dna_21, c)
+			//fmt.Print(outp_string)
 			
 
 			//outp.WriteString(outp_string)
