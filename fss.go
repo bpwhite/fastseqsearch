@@ -222,9 +222,9 @@ func main() {
 
 				//fmt.Printf("s1: %v, s2: %v\n", s1_pt, s2_pt)
 
-				radius1 := math.Sqrt(s1_pt[0]*s1_pt[0] + s1_pt[1]*s1_pt[1] + s1_pt[2]*s1_pt[2])
-				radius2 := math.Sqrt(s2_pt[0]*s2_pt[0] + s2_pt[1]*s2_pt[1] + s2_pt[2]*s2_pt[2])
-				radist := math.Abs(radius1 - radius2)
+				//radius1 := math.Sqrt(s1_pt[0]*s1_pt[0] + s1_pt[1]*s1_pt[1] + s1_pt[2]*s1_pt[2])
+				//radius2 := math.Sqrt(s2_pt[0]*s2_pt[0] + s2_pt[1]*s2_pt[1] + s2_pt[2]*s2_pt[2])
+				//radist := math.Abs(radius1 - radius2)
 
 				eucdist := math.Sqrt(math.Pow(s1_pt[0]-s2_pt[0], 2) + math.Pow(s1_pt[1]-s2_pt[1], 2) + math.Pow(s1_pt[2]-s2_pt[2], 2))
 				if print_dists == 1 {
@@ -232,7 +232,7 @@ func main() {
 				}
 
 				pdists[sample] = pdist
-				eucdists[sample] = radist
+				eucdists[sample] = eucdist
 				weights[sample] = 1.0
 				
 			}
