@@ -6,10 +6,11 @@ import (
 	"math"
 	"math/big"
 	//"time"
-	"github.com/gonum/stat"
-	//"os"
-)
+	"os"
+	"reflect"
 
+	"github.com/gonum/stat"
+)
 
 func main() {
 	// CYTC005-12|Homo sapiens|COI-5P|HM771214
@@ -17,6 +18,9 @@ func main() {
 	// CYTC1000-12|Pan troglodytes schweinfurthii|COI-5P|JF727192
 	string2 := "CACAAAGATATTGGAACACTATACCTACTATTCGGCGCATGGGCTGGAGTCCTGGGCACAGCCCTAAGTCTCCTTATTCGGGCTGAACTAGGCCAACCAGGCAACCTTCTAGGTAATGACCACATCTACAATGTCATCGTCACAGCCCATGCATTCGTAATAATCTTCTTCATAGTAATGCCTATCATAATCGGAGGCTTTGGCAACTGGCTAGTCCCCTTGATAATTGGTGCCCCCGACATGGCATTCCCCCGCATAAACAACATAAGCTTCTGACTCCTACCCCCTTCTCTCCTACTTCTACTTGCATCTGCCATAGTAGAAGCCGGCGCCGGAACAGGTTGAACGGTCTACCCTCCCTTAGCGGGAAACTACTCGCATCCTGGAGCCTCCGTAGACCTAACCATCTTCTCCTTGCATCTGGCAGGCGTCTCCTCTATCCTAGGAGCCATTAACTTCATCACAACAATTATTAATATAAAACCTCCTGCCATAACCCAATACCAAACACCCCTCTTCGTCTGATCCGTCCTAATCACAGCAGTCTTACTTCTCCTATCCCTCCCAGTCCTAGCTGCTGGCATCACCATACTATTGACAGATCGTAACCTCAACACTACCTTCTTCGATCCAGCCGGGGGAGGAGACCCTATTCTATATCAGCACTTATTCTGATTTTTTGGCCACCCCGAAGTTTATATTCTTATCCTACCAGGCTTCGGAATAATTTCCCACATTGTAACTTATTACTCCGGAAAAAAAGAACCATTTGGATATATAGGCATGGTTTGAGCTATAATATCAATTGGTTTCCTAGGGTTTATCGTGTGAGCACACCATATATTTACAGTAGGAATAGACGTAGACACACGAGCCTATTTCACCTCCGCTACCATAATCATTGCTATTCCTACCGGCGTCAAAGTATTCAGCTGACTCGCTACACTTCACGGAAGC"
 
+	RemoveDuplicates(string1)
+
+	os.Exit(0)
 	// G -> C = 4 transversion
 	// C -> G = 4 transversion
 	// G -> T = 19 transversion
@@ -29,10 +33,13 @@ func main() {
 	// T -> A = 21 transversion
 	// A -> G = 6 transition
 	// G -> A = 6 transition
-	
+
 	generations := 20
 	population_size := 10
-	
+
+	//mut_strength := 5
+	//mut_rate := 15
+
 	// search replicates
 	//B := 1
 	// number of sample hits to check
@@ -41,7 +48,7 @@ func main() {
 	subn := 100
 	//vary_dnastat := 1
 	print_dists := 0
-	
+
 	// output
 	//t := time.Now()
 	//fmt.Println(t.Format("20060102150405"))
@@ -54,66 +61,65 @@ func main() {
 	dna_g := 1.0
 	dna_c := 1.0
 
-	dna_6 	:= 1.0 
-	dna_23 	:= 1.0
-	dna_4 	:= 1.0
-	dna_19 	:= 1.0
-	dna_2 	:= 1.0
-	dna_21 	:= 1.0
-		
+	dna_6 := 1.0
+	dna_23 := 1.0
+	dna_4 := 1.0
+	dna_19 := 1.0
+	dna_2 := 1.0
+	dna_21 := 1.0
+
 	n1 := len(string1)
 	n2 := len(string2)
-	
+
 	var population = make([]string, population_size)
-	
+
 	last_dna_a := dna_a
 	last_dna_t := dna_t
 	last_dna_g := dna_g
 	last_dna_c := dna_c
-	
+
 	last_dna_6 := dna_6
 	last_dna_23 := dna_23
 	last_dna_4 := dna_4
-	last_dna_19	:= dna_19
+	last_dna_19 := dna_19
 	last_dna_2 := dna_2
 	last_dna_21 := dna_21
-		
-	for pop := 0; pop < population_size; pop++ {
-		
-		final_cor := 0.0
-		
 
-		for gen := 0; gen < generations; gen++ {			
+	for pop := 0; pop < population_size; pop++ {
+
+		final_cor := 0.0
+
+		for gen := 0; gen < generations; gen++ {
 
 			var correlations = make([]float64, generations)
 			var pdists = make([]float64, sub_sample_size)
 			var eucdists = make([]float64, sub_sample_size)
 			var weights = make([]float64, sub_sample_size)
-			
+
 			if gen == 0 {
 				dna_a = last_dna_a
 				dna_t = last_dna_t
 				dna_g = last_dna_g
 				dna_c = last_dna_c
-				
+
 				dna_6 = last_dna_6
 				dna_23 = last_dna_23
 				dna_4 = last_dna_4
-				dna_19	= last_dna_19
+				dna_19 = last_dna_19
 				dna_2 = last_dna_2
 				dna_21 = last_dna_21
 			} else {
-				dna_a 	= mutate(dna_a, 5, 15)
-				dna_t 	= mutate(dna_t, 5, 15)
-				dna_g 	= mutate(dna_g, 5, 15)
-				dna_c 	= mutate(dna_c, 5, 15)
+				dna_a = mutate(dna_a, 5, 15)
+				dna_t = mutate(dna_t, 5, 15)
+				dna_g = mutate(dna_g, 5, 15)
+				dna_c = mutate(dna_c, 5, 15)
 
-				dna_6	= mutate(dna_6, 5, 15)
-				dna_23 	= mutate(dna_23, 5, 15)
-				dna_4 	= mutate(dna_4, 5, 15)
-				dna_19 	= mutate(dna_19, 5, 15)
-				dna_2 	= mutate(dna_2, 5, 15)
-				dna_21 	= mutate(dna_21, 5, 15)	
+				dna_6 = mutate(dna_6, 5, 15)
+				dna_23 = mutate(dna_23, 5, 15)
+				dna_4 = mutate(dna_4, 5, 15)
+				dna_19 = mutate(dna_19, 5, 15)
+				dna_2 = mutate(dna_2, 5, 15)
+				dna_21 = mutate(dna_21, 5, 15)
 			}
 
 			// sample data
@@ -139,6 +145,7 @@ func main() {
 				substr1 := string1[r1:end1]
 				substr2 := string2[r2:end2]
 
+				// hold current position in c-space
 				s1_pt := [3]float64{0, 0, 0}
 				s2_pt := [3]float64{0, 0, 0}
 
@@ -234,26 +241,24 @@ func main() {
 				pdists[sample] = pdist
 				eucdists[sample] = eucdist
 				weights[sample] = 1.0
-				
+
 			}
-		
-			
+
 			c := stat.Correlation(pdists, eucdists, weights)
 			//fmt.Printf("Correlation is %.5f\n", c)
 			correlations[gen] = c
 			final_cor = c
-			
-			// rep, a, t, g, c, dna_6, dna_23, dna_4, dna_19, dna_2, dna_21, correlation	
+
+			// rep, a, t, g, c, dna_6, dna_23, dna_4, dna_19, dna_2, dna_21, correlation
 			//outp_string := fmt.Sprintf("%d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.5f\n", gen, dna_a, dna_t, dna_g, dna_c, dna_6, dna_23, dna_4, dna_19, dna_2, dna_21, c)
 			//fmt.Print(outp_string)
-			
 
 			//outp.WriteString(outp_string)
 		}
 		population[pop] = fmt.Sprintf("%.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.5f\n", dna_a, dna_t, dna_g, dna_c, dna_6, dna_23, dna_4, dna_19, dna_2, dna_21, final_cor)
 		//outp.Sync()
 	}
-	
+
 	fmt.Println(population)
 }
 
@@ -269,16 +274,32 @@ func gen_cryp_num(input int64) (n int64) {
 
 func mutate(input float64, strength int64, rate int64) (mutated float64) {
 	multiplier := 1.0
-	if (gen_cryp_num(100) <= rate) {
+	if gen_cryp_num(100) <= rate {
 		multiplier = float64(gen_cryp_num(strength))
 		sign := 1.0
-		if (gen_cryp_num(100) < 50) {
+		if gen_cryp_num(100) < 50 {
 			sign = -1.0
 		}
 		mutated = input + float64(multiplier)*sign
 	} else {
 		mutated = input
 	}
-	
+
 	return mutated
+}
+
+func detect_alphabet(input string) (num_letters int) {
+	num_letters = 0
+	return num_letters
+}
+
+func RemoveDuplicates(xs string) (found map[string]bool) {
+	found = make(map[string]bool)
+	for _, x := range xs {
+		if !found[string(x)] {
+			found[string(x)] = true
+		}
+	}
+	fmt.Println(found)
+	return found
 }
