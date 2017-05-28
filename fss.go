@@ -6,7 +6,7 @@ import (
 	//"math"
 	"math/big"
 	//"time"
-	"os"
+	//"os"
 	//"reflect"
 	"sort"
 
@@ -40,9 +40,9 @@ func main() {
 	// number of sample hits to check
 	sub_sample_size := 50
 	// sequence slice size
-	subn := 100
+	subn := 25
 	//vary_dnastat := 1
-	print_dists := 0
+	print_dists := 1
 
 	// output
 	//t := time.Now()
@@ -58,6 +58,7 @@ func main() {
 	for gen := 0; gen < generations; gen++ {
 
 		var pdists = make([]float64, sub_sample_size)
+		var rev_pdists = make([]float64, sub_sample_size)
 
 		// sample data
 		for sample := 0; sample < sub_sample_size; sample++ {
@@ -83,33 +84,27 @@ func main() {
 			substr1 := string1[r1:end1]
 			substr2 := string2[r2:end2]
 
-			fmt.Println("Forward: ", substr1)
-			rev_substr1 := reverseComplement(substr1)
-			fmt.Println("Reverse: ", rev_substr1)
+			//fmt.Println("Forward: ", substr1)
+			//rev_substr1 := reverseComplement(substr1)
+			//fmt.Println("Reverse: ", rev_substr1)
+			rev_substr2 := reverseComplement(substr2)
 
-			os.Exit(0)
-			matches := 0
-			for i := 0; i < subn; i++ {
-				//b[i] =
+			matches := countMatch(substr1, substr2)
+			rev_matches := countMatch(substr1, rev_substr2)
 
-				xor_compare := int(substr1[i] ^ substr2[i])
-
-				if xor_compare != 0 {
-					matches++
-				}
-
-			}
 			pdist := 1.0 - float64(matches)/float64(subn)
+			rev_pdist := 1.0 - float64(rev_matches)/float64(subn)
 
 			if print_dists == 1 {
-				fmt.Printf("%d => %.2f\n", matches, pdists)
+				fmt.Printf("%d => %.2f \t %d => %.2f\n", matches, pdist, rev_matches, rev_pdist)
 			}
 
 			pdists[sample] = pdist
+			rev_pdists[sample] = rev_pdist
 
 		}
 
-		fmt.Println(pdists)
+		//fmt.Println(pdists)
 		//outp.WriteString(outp_string)
 	}
 	//outp.Sync()
@@ -195,4 +190,23 @@ func reverseString(s string) string {
 		chars[i], chars[j] = chars[j], chars[i]
 	}
 	return string(chars)
+}
+
+func countMatch(substr1 string, substr2 string) (matches int) {
+	matches = 0
+	len1 := len(substr1)
+	len2 := len(substr2)
+	if len1 != len2 {
+		fmt.Println("Substring length mismatch.")
+	}
+	for i := 0; i < len1; i++ {
+
+		xor_compare := int(substr1[i] ^ substr2[i])
+
+		if xor_compare != 0 {
+			matches++
+		}
+
+	}
+	return matches
 }
