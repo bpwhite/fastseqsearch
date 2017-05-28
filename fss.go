@@ -83,9 +83,9 @@ func main() {
 			substr1 := string1[r1:end1]
 			substr2 := string2[r2:end2]
 
-			fmt.Println(substr1)
+			fmt.Println("Forward: ", substr1)
 			rev_substr1 := reverseComplement(substr1)
-			fmt.Println(rev_substr1)
+			fmt.Println("Reverse: ", rev_substr1)
 
 			os.Exit(0)
 			matches := 0
@@ -181,23 +181,18 @@ func reverseComplement(xs string) (rs string) {
 	nuc_comp["C"] = "G"
 
 	for _, x := range xs {
-		fmt.Println(x)
-		os.Exit(0)
-		//rs := fmt.Sprint(rs, nuc_comp[x])
+		rs = fmt.Sprint(rs, nuc_comp[string(x)])
 	}
 
-	//	rs = reverseString(rs)
+	rs = reverseString(rs)
+
 	return rs
 }
 
-/*
 func reverseString(s string) string {
-	o := make([]int, utf8.RuneCountInString(s))
-	i := len(o)
-	for _, c := range s {
-		i--
-		o[i] = c
+	chars := []rune(s)
+	for i, j := 0, len(chars)-1; i < j; i, j = i+1, j-1 {
+		chars[i], chars[j] = chars[j], chars[i]
 	}
-	return string(o)
+	return string(chars)
 }
-*/
