@@ -3,14 +3,14 @@ package main
 import (
 	"crypto/rand"
 	"fmt"
-	"math"
+	//"math"
 	"math/big"
 	//"time"
 	"os"
 	//"reflect"
 	"sort"
 
-	"github.com/gonum/stat"
+	//"github.com/gonum/stat"
 )
 
 func main() {
@@ -30,26 +30,7 @@ func main() {
 	a2_letters := detect_letters(string2)
 	fmt.Println("Alphabet 2 base size: ", a2_size, " Letters: ", a2_letters)
 
-	init_params1 := make(map[string]float64)
-	init_params2 := make(map[string]float64)
-
-	init_dims1 := make(map[string]int)
-	init_dims2 := make(map[string]int)
-
-	for i := 0; i < len(a1_letters); i++ {
-		init_params1[a1_letters[i]] = 1.0
-		init_dims1[a1_letters[i]] = 0
-	}
-	for i := 0; i < len(a2_letters); i++ {
-		init_params2[a2_letters[i]] = 1.0
-		init_dims2[a2_letters[i]] = 0
-	}
-
-	fmt.Println(init_params1, init_dims1)
-	fmt.Println(init_params2, init_dims2)
-
 	generations := 20
-	population_size := 10
 
 	//mut_strength := 5
 	//mut_rate := 15
@@ -57,7 +38,7 @@ func main() {
 	// search replicates
 	//B := 1
 	// number of sample hits to check
-	sub_sample_size := 1
+	sub_sample_size := 50
 	// sequence slice size
 	subn := 100
 	//vary_dnastat := 1
@@ -74,36 +55,12 @@ func main() {
 	n1 := len(string1)
 	n2 := len(string2)
 
-	var population = make([]string, population_size)
-
 	for gen := 0; gen < generations; gen++ {
 
-		dims1 := make(map[string]int)
-		dims2 := make(map[string]int)
-
-		params1 := make(map[string]float64)
-		params2 := make(map[string]float64)
-
-		if gen == 0 {
-			dims1 = init_dims1
-			dims2 = init_dims2
-			params1 = init_params1
-			params2 = init_params2
-		}
-
-		var correlations = make([]float64, generations)
 		var pdists = make([]float64, sub_sample_size)
-		var eucdists = make([]float64, sub_sample_size)
-		var weights = make([]float64, sub_sample_size)
-
-		fmt.Println("Dims1: ", dims1, " Dims2: ", " Params1: ", params1, " Params2: ", params2)
 
 		// sample data
 		for sample := 0; sample < sub_sample_size; sample++ {
-
-			// hold current position in c-space
-			var s1_pt = make([]float64, len(dims1))
-			var s2_pt = make([]float64, len(dims2))
 
 			// random substring size
 			r1 := gen_cryp_num(int64(n1))
@@ -126,6 +83,11 @@ func main() {
 			substr1 := string1[r1:end1]
 			substr2 := string2[r2:end2]
 
+			fmt.Println(substr1)
+			rev_substr1 := reverseComplement(substr1)
+			fmt.Println(rev_substr1)
+
+			os.Exit(0)
 			matches := 0
 			for i := 0; i < subn; i++ {
 				//b[i] =
@@ -136,48 +98,23 @@ func main() {
 					matches++
 				}
 
-				//fmt.Println(string(substr1[i]))
-				s1_pt[dims1[string(substr1[i])]] += params1[string(substr1[i])]
-				s2_pt[dims2[string(substr2[i])]] += params2[string(substr2[i])]
-
-				fmt.Println(s1_pt, " => ", s2_pt)
-
 			}
-			os.Exit(0)
 			pdist := 1.0 - float64(matches)/float64(subn)
 
-			//fmt.Printf("s1: %v, s2: %v\n", s1_pt, s2_pt)
-
-			//radius1 := math.Sqrt(s1_pt[0]*s1_pt[0] + s1_pt[1]*s1_pt[1] + s1_pt[2]*s1_pt[2])
-			//radius2 := math.Sqrt(s2_pt[0]*s2_pt[0] + s2_pt[1]*s2_pt[1] + s2_pt[2]*s2_pt[2])
-			//radist := math.Abs(radius1 - radius2)
-
-			eucdist := math.Sqrt(math.Pow(s1_pt[0]-s2_pt[0], 2) + math.Pow(s1_pt[1]-s2_pt[1], 2) + math.Pow(s1_pt[2]-s2_pt[2], 2))
 			if print_dists == 1 {
-				fmt.Printf("%d => %.2f, => %v => %v\n", matches, pdist, eucdist)
+				fmt.Printf("%d => %.2f\n", matches, pdists)
 			}
 
 			pdists[sample] = pdist
-			eucdists[sample] = eucdist
-			weights[sample] = 1.0
 
 		}
 
-		c := stat.Correlation(pdists, eucdists, weights)
-		//fmt.Printf("Correlation is %.5f\n", c)
-		correlations[gen] = c
-		//final_cor = c
-
-		// rep, a, t, g, c, dna_6, dna_23, dna_4, dna_19, dna_2, dna_21, correlation
-		//outp_string := fmt.Sprintf("%d, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.5f\n", gen, dna_a, dna_t, dna_g, dna_c, dna_6, dna_23, dna_4, dna_19, dna_2, dna_21, c)
-		//fmt.Print(outp_string)
-
+		fmt.Println(pdists)
 		//outp.WriteString(outp_string)
 	}
-	//population[pop] = fmt.Sprintf("%.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.2f, %.5f\n", dna_a, dna_t, dna_g, dna_c, dna_6, dna_23, dna_4, dna_19, dna_2, dna_21, final_cor)
 	//outp.Sync()
 
-	fmt.Println(population)
+	//fmt.Println(population)
 }
 
 func gen_cryp_num(input int64) (n int64) {
@@ -223,13 +160,44 @@ func detect_letters(input string) (letters []string) {
 	sort.Strings(letters)
 	return letters
 }
+
 func RemoveDuplicates(xs string) (found map[string]bool) {
 	found = make(map[string]bool)
+
 	for _, x := range xs {
+
 		if !found[string(x)] {
 			found[string(x)] = true
 		}
 	}
-	//fmt.Println(found)
 	return found
 }
+
+func reverseComplement(xs string) (rs string) {
+	nuc_comp := make(map[string]string)
+	nuc_comp["A"] = "T"
+	nuc_comp["T"] = "A"
+	nuc_comp["G"] = "C"
+	nuc_comp["C"] = "G"
+
+	for _, x := range xs {
+		fmt.Println(x)
+		os.Exit(0)
+		//rs := fmt.Sprint(rs, nuc_comp[x])
+	}
+
+	//	rs = reverseString(rs)
+	return rs
+}
+
+/*
+func reverseString(s string) string {
+	o := make([]int, utf8.RuneCountInString(s))
+	i := len(o)
+	for _, c := range s {
+		i--
+		o[i] = c
+	}
+	return string(o)
+}
+*/
