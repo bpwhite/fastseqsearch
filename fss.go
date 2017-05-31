@@ -43,11 +43,11 @@ func main() {
 	//mut_rate := 15
 
 	// search replicates
-	B := 10
+	B := 50
 	// number of sample hits to check
 	sub_sample_size := 500
 	// sequence slice size
-	subn := 25
+	subn := 50
 	//vary_dnastat := 1
 	print_dists := 0
 
@@ -63,13 +63,16 @@ func main() {
 	n2 := len(string2)
 
 	var medians = make([]float64, B)
+	var skews = make([]float64, B)
+	var b_weights = make([]float64, B)
 
 	for rep := 0; rep < B; rep++ {
 
 		var pdists = make([]float64, sub_sample_size)
 		var rev_pdists = make([]float64, sub_sample_size)
 		var h_comps = make([]float64, sub_sample_size)
-		var h_comp_weights = make([]float64, sub_sample_size)
+		var weights = make([]float64, sub_sample_size)
+		b_weights[rep] = 1.0
 
 		// sample data
 		for sample := 0; sample < sub_sample_size; sample++ {
@@ -130,16 +133,22 @@ func main() {
 
 			// Complementary stats
 			h_comps[sample] = h_comp
-			h_comp_weights[sample] = 1.0
+			weights[sample] = 1.0
 		}
 		sort.Float64s(h_comps)
-		median := stat.Quantile(0.5, 1, h_comps, h_comp_weights)
+		median := stat.Quantile(0.5, 1, h_comps, weights)
+		skew := stat.Skew(h_comps, weights)
 		medians[rep] = median
+		skews[rep] = skew
 	}
 	outp.Sync()
 	//fmt.Println(h_comps)
 
-	fmt.Println(medians)
+	//fmt.Println(medians)
+	sort.Float64s(skews)
+	//fmt.Println(skews)
+	mean_skew := stat.Mean(skews, b_weights)
+	fmt.Println("Mean skew: ", mean_skew)
 }
 
 func gen_cryp_num(input int64) (n int64) {
