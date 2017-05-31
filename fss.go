@@ -45,9 +45,9 @@ func main() {
 	// search replicates
 	B := 10
 	// number of sample hits to check
-	sub_sample_size := 1000
+	sub_sample_size := 500
 	// sequence slice size
-	subn := 10
+	subn := 25
 	//vary_dnastat := 1
 	print_dists := 0
 
